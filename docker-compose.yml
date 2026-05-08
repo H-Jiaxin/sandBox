@@ -1,0 +1,23 @@
+services:
+  lab:
+    build: .
+    container_name: ${INSTANCE_NAME}
+    # 保持容器运行，防止启动后立即退出
+    stdin_open: true
+    tty: true
+    # 资源限制，保护宿主机稳定
+    deploy:
+      resources:
+        limits:
+          cpus: ${CPU_LIMIT:-2.0}
+          memory: ${MEM_LIMIT:-2G}
+    # 自动重启设置：手动销毁前保持运行
+    restart: "no"
+    volumes:
+      - ./instances/${INSTANCE_NAME}:/workspace
+    working_dir: /workspace
+    # 网络配置（如有需要可暴露端口）
+    # ports:
+    #   - "8080:8080"
+    environment:
+      - TERM=xterm-256color
