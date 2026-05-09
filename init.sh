@@ -32,8 +32,6 @@ case "$1" in
         sudo mkdir -p "./instances/$INSTANCE_NAME"
         
         sudo INSTANCE_NAME=$INSTANCE_NAME \
-             CPU_LIMIT=$CPU_LIMIT \
-             MEM_LIMIT=$MEM_LIMIT \
              docker compose -p "$INSTANCE_NAME" up -d
         
         echo "------------------------------------------------"
@@ -53,13 +51,19 @@ case "$1" in
         # 显式传递 INSTANCE_NAME，防止 Docker Compose 解析 yml 时校验失败
         # 同时保持其他变量（如 CPU/MEM）有默认值，或者直接传入
         sudo INSTANCE_NAME=$TARGET_NAME \
-             CPU_LIMIT=1.0 \
-             MEM_LIMIT=1G \
              docker compose -p "$TARGET_NAME" down
         
-        # 自动清理数据目录（建议保持手动决定是否取消注释）
-        # sudo rm -rf "./instances/$TARGET_NAME"
-        
+        # 自动清理数据目录（建议保持手动决定）
+        # 增加 -p 直接显示提示语，增加 -n 1 只读取一个字符
+        read -p "是否清除数据目录 ./instances/$TARGET_NAME? (y/n): " -n 1 -r yon
+
+        # 转换输入为小写进行匹配，并增加对回车的处理（默认不删）
+        if [[ "$yon" =~ ^[Yy]$ ]]; then
+            sudo rm -rf "./instances/$TARGET_NAME"
+            echo "数据目录已清理"
+        else
+            echo "保留数据目录: ./instances/$TARGET_NAME"
+        fi
         echo "实例 $TARGET_NAME 已清理。"
         ;;
 

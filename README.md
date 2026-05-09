@@ -6,4 +6,5 @@
 git clone https://github.com/H-Jiaxin/sandBox.git
 
 进入目录
+运行 'sudo docker build -t lab-base:latest .' 构建基础镜像
 给init.sh运行权限，使用./init.sh 获取帮助

@@ -1,6 +1,6 @@
 services:
   lab:
-    build: .
+    image: lab-base:latest 
     container_name: ${INSTANCE_NAME}
     # 保持容器运行，防止启动后立即退出
     stdin_open: true
