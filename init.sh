@@ -37,11 +37,11 @@ case "$1" in
         sudo mkdir -p "./instances/$INSTANCE_NAME"
         
         sudo INSTANCE_NAME=$INSTANCE_NAME \
-             docker compose -p "$INSTANCE_NAME" up -d
+        docker compose -p "$INSTANCE_NAME" up -d
         
         echo "------------------------------------------------"
         echo "沙箱创建成功！"
-        echo "进入命令: docker exec -it $INSTANCE_NAME /bin/bash"
+        echo "进入命令: ./init.sh run $UID_STR"
         echo "销毁命令: ./init.sh destroy $UID_STR"
         ;;
     destroy)
@@ -55,8 +55,7 @@ case "$1" in
         
         # 显式传递 INSTANCE_NAME，防止 Docker Compose 解析 yml 时校验失败
         # 同时保持其他变量（如 CPU/MEM）有默认值，或者直接传入
-        sudo INSTANCE_NAME=$TARGET_NAME \
-             docker compose -p "$TARGET_NAME" down
+        sudo docker compose -p "$TARGET_NAME" down
         
         # 自动清理数据目录（建议保持手动决定）
         # 增加 -p 直接显示提示语，增加 -n 1 只读取一个字符
@@ -76,7 +75,16 @@ case "$1" in
         echo "当前运行中的沙箱实例："
         docker ps --filter "name=sandbox-" --format "table {{.Names}}\t{{.Status}}\t{{.RunningFor}}"
         ;;
+    run)
+      if [ -z "$2" ]; then
+        echo "错误: 请提供要销毁的 UID"
+        usage
+      fi
+      TARGET_NAME="sandbox-$2"
 
+      echo "正在进入容器..."
+      sudo docker exec -it $TARGET_NAME /bin/bash
+      ;;
     *)
         usage
         ;;
