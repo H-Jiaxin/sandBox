@@ -21,6 +21,11 @@ usage() {
 
 case "$1" in
   create)
+        NET_NAME="sandbox-shared-net"
+        if ! sudo docker network inspect "$NET_NAME" >/dev/null 2>&1; then
+            echo "首次运行，正在自动创建公共网络: $NET_NAME..."
+            sudo docker network create "$NET_NAME"
+        fi
         UID_STR=$(generate_uid)
         INSTANCE_NAME="sandbox-${UID_STR}"
         CPU_LIMIT=${2:-$CPU_DEFAULT}

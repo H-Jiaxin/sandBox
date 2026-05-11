@@ -3,6 +3,8 @@ services:
     image: lab-base:latest 
     container_name: ${INSTANCE_NAME}
     # 保持容器运行，防止启动后立即退出
+    networks:
+      - shared_net
     stdin_open: true
     tty: true
     # 资源限制，保护宿主机稳定
@@ -21,3 +23,9 @@ services:
     #   - "8080:8080"
     environment:
       - TERM=xterm-256color
+networks:
+  shared_net:
+    external: true
+    # 所有的容器都会挤进这一个网桥里
+    name: sandbox-shared-net    
+  
