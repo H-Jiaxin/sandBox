@@ -73,7 +73,7 @@ case "$1" in
 
     list)
         echo "当前运行中的沙箱实例："
-        docker ps --filter "name=sandbox-" --format "table {{.Names}}\t{{.Status}}\t{{.RunningFor}}"
+        docker ps -a --filter "name=sandbox-" --format "table {{.Names}}\t{{.Status}}\t{{.RunningFor}}"
         ;;
     run)
       if [ -z "$2" ]; then
@@ -81,6 +81,13 @@ case "$1" in
         usage
       fi
       TARGET_NAME="sandbox-$2"
+      
+      # 检查容器是否在运行，没运行先启动
+        STATUS=$(docker inspect -f '{{.State.Running}}' "$TARGET_NAME" 2>/dev/null)
+        if [ "$STATUS" != "true" ]; then
+            echo "容器未运行，正在尝试启动..."
+            sudo docker start "$TARGET_NAME"
+        fi
 
       echo "正在进入容器..."
       sudo docker exec -it $TARGET_NAME /bin/bash
